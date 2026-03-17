@@ -1,10 +1,11 @@
 require('dotenv').config();
-const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js'); // Tambah MessageMedia buat stiker
+const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+// Pake model terbaru yang lu bilang bisa
+const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' }); 
 
 const client = new Client({
     authStrategy: new LocalAuth()
@@ -16,59 +17,67 @@ client.on('qr', (qr) => {
 });
 
 client.on('ready', () => {
-    console.log('Bot Sarkas v2.0 udah jalan bro!');
+    console.log('Bot Sarkas v3.0 (Time-Aware) udah jalan bro!');
 });
 
 client.on('message', async msg => {
-    // 1. Abaikan kalau pesannya dari Grup atau Status WA
     const chat = await msg.getChat();
     if (chat.isGroup || msg.isStatus) return;
 
-    // 2. Ubah jadi huruf kecil semua
     const text = msg.body.toLowerCase();
-    console.log(`[CCTV] Nangkep chat dari temen lu: "${text}"`);
 
-    // 3. FILTER DOSEN / KAMPUS (Bot auto mingkem kalau ada kata-kata ini)
+    // 1. FILTER DOSEN / KAMPUS
     const kataBahaya = ['assalamualaikum', 'tugas', 'bapak', 'ibu', 'kuliah', 'nim', 'absen', 'revisi', 'ujian'];
-    if (kataBahaya.some(kata => text.includes(kata))) {
-        console.log(`Ada chat bawa-bawa kampus/dosen, bot mingkem.`);
+    if (kataBahaya.some(kata => text.includes(kata))) return; 
+
+    // 2. EASTER EGG: SAWIT
+    if (text.includes('sawit') || text.includes('nyawit')) {
+        await msg.reply('*[Asisten Bot]*\nnyawit nih orang 🌴🤣');
         return; 
     }
 
-    // 4. EASTER EGG: SAWIT
-    if (text.includes('sawit') || text.includes('nyawit')) {
-        await msg.reply('*[Asisten Bot]*\nnyawit nih orang 🌴🤣');
-        
-        // --- OPSIONAL KIRIM STIKER SAWIT ---
-        // Kalau lu punya file stiker 'sawit.webp' di folder lu, hapus tanda // di bawah ini:
-        // const stikerSawit = MessageMedia.fromFilePath('./sawit.webp');
-        // await client.sendMessage(msg.from, stikerSawit, { sendMediaAsSticker: true });
-        
-        return; // Berhenti di sini, gak usah panggil Gemini
-    }
-
-    // 5. TRIGGER PANGGILAN (Pakai batas kata \b biar "mobil" gak ke-trigger)
+    // 3. TRIGGER PANGGILAN
     const regexPanggilan = /\b(p|bil|wei|woi|balas|lama)\b/;
 
     if (regexPanggilan.test(text)) {
+        console.log(`[CCTV] Ada yang nge-ping: "${msg.body}"`);
+        
+        // --- LOGIC DETEKSI WAKTU ---
+        const jam = new Date().getHours(); // Ngambil jam dari sistem laptop (WIB)
+        let statusKondisi = "";
+
+        if (jam >= 6 && jam < 18) {
+            statusKondisi = "Sekarang pagi/siang/sore. Abil lagi sibuk beraktivitas, ngerjain tugas, atau fokus kerja remote. Jadi HP-nya dianggurin.";
+        } else if (jam >= 18 && jam < 23) {
+            statusKondisi = "Sekarang malam hari. Abil lagi santai, me-time, atau lagi push rank/main game ritme. Jangan diganggu.";
+        } else {
+            statusKondisi = "Sekarang tengah malam/dini hari. Abil kemungkinan besar lagi tidur lelap atau lagi begadang ngoding project. HP mode senyap.";
+        }
+
         try {
+            // Prompt Super Ketat biar gak ngasih opsi 1, 2, 3
             const prompt = `
-            Ada teman Abil yang nge-chat: "${msg.body}"
-            Balas dengan nada santai, sedikit sarkas, kasih tau kalau Abil lagi sibuk dan gak pegang HP atau mode fokus atau lagi kerja.
-            Gunakan bahasa gaul (gue, lu, bro). Jangan kaku. Maksimal 2 kalimat.
+            Kondisi Abil Saat Ini: ${statusKondisi}
+            Pesan dari temannya: "${msg.body}"
+
+            Tugasmu: Berperanlah sebagai asisten bot WhatsApp Abil. Balas chat tersebut dengan nada santai, sedikit sarkas ala anak muda (gue, lu, bro). Jelaskan alasan Abil tidak membalas berdasarkan "Kondisi Abil Saat Ini".
+            
+            ATURAN SANGAT KETAT:
+            1. LANGSUNG BERIKAN ISI BALASANNYA SAJA!
+            2. DILARANG MEMBERIKAN PILIHAN ATAU OPSI (1, 2, 3).
+            3. DILARANG MENGGUNAKAN AWALAN SEPERTI "Oke", "Tentu", "Ini dia".
+            4. Balasan harus singkat, maksimal 2 kalimat.
             `;
 
             const result = await model.generateContent(prompt);
-            const response = await result.response;
-            await msg.reply(`*[Asisten Bot]*\n${response.text()}`);
-
-            // --- OPSIONAL KIRIM STIKER ROASTING ---
-            // Kalau lu punya gambar 'roasting.webp' di folder, hapus tanda // di bawah ini:
-            // const stikerRoasting = MessageMedia.fromFilePath('./roasting.webp');
-            // await client.sendMessage(msg.from, stikerRoasting, { sendMediaAsSticker: true });
+            let responseText = result.response.text().trim(); // .trim() buat ngilangin spasi/enter berlebih
+            
+            await msg.reply(`*[Asisten Bot]*\n${responseText}`);
 
         } catch (error) {
-            console.error("Error AI:", error);
+            console.error("[ERROR AI]:", error.message);
+            // FALLBACK: Kalau API Limit / Error 429, bot bakal pake balasan manual ini
+            await msg.reply(`*[Asisten Bot]*\nSabar woi, Abil lagi gak megang HP. (Botnya lagi limit API, ntar juga dibales sama orangnya).`);
         }
     }
 });
