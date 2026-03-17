@@ -21,8 +21,8 @@ Sebelum mulai, pastikan di PC/Server kalian sudah terpasang:
 ### 1. Clone Repository & Install Dependencies
 Buka terminal/CMD, lalu jalankan perintah berikut:
 ```bash
-git clone https://github.com/USERNAME_GITHUB_KALIAN/NAMA_REPO_KALIAN.git
-cd NAMA_REPO_KALIAN
+git clone https://github.com/SayMaven/whatsbot.git
+cd whatsbot
 npm install whatsapp-web.js qrcode-terminal @google/generative-ai dotenv
 ```
 
@@ -30,7 +30,7 @@ npm install whatsapp-web.js qrcode-terminal @google/generative-ai dotenv
 Buat file baru di dalam folder project dengan nama **tepat** `.env`. (Catatan: file ini sengaja di-block oleh `.gitignore` agar API Key tidak bocor ke publik).
 Isi file tersebut dengan API Key Gemini kalian:
 ```text
-GEMINI_API_KEY=masukin_api_key_gemini_kalian_disini_tanpa_tanda_kutip
+GEMINI_API_KEY="masukin_api_key_gemini_kalian_disini"
 ```
 
 ### 3. Jalankan Bot (Mode Testing)
