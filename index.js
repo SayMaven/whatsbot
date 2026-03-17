@@ -26,7 +26,7 @@ client.on('message', async msg => {
     const text = msg.body.toLowerCase();
 
     // 1. FILTER DOSEN / KAMPUS
-    const kataBahaya = ['assalamualaikum', 'tugas', 'bapak', 'ibu', 'kuliah', 'nim', 'absen', 'revisi', 'ujian'];
+    const kataBahaya = ['assalamualaikum', 'bapak', 'ibu', 'kuliah', 'nim', 'absen', 'revisi', 'ujian'];
     if (kataBahaya.some(kata => text.includes(kata))) return; 
 
     // 2. EASTER EGG: SAWIT
@@ -47,11 +47,11 @@ client.on('message', async msg => {
         let statusKondisi = "";
 
         if (jam >= 6 && jam < 18) {
-            statusKondisi = "Sekarang pagi/siang/sore. Abil lagi sibuk nugas kuliah atau fokus ngerjain project remote-nya. HP dianggurin.";
+            statusKondisi = "Sekarang pagi/siang/sore. Abil lagi sibuk atau fokus ngerjain project remote-nya. HP dianggurin.";
         } else if (jam >= 18 && jam < 23) {
-            statusKondisi = "Sekarang malam hari. Abil lagi me-time, dengerin musik J-Pop, atau main game rhythm. Jangan diganggu.";
+            statusKondisi = "Sekarang malam hari. Abil lagi me-time, dengerin musik , game rhythm atau push project. Jangan diganggu.";
         } else {
-            statusKondisi = "Sekarang tengah malam/dini hari. Abil kemungkinan besar lagi tidur lelap atau lagi mode kalong begadang ngoding. HP mode senyap.";
+            statusKondisi = "Sekarang tengah malam/dini hari. Abil kemungkinan besar lagi tidur lelap atau lagi mode begadang ngoding. HP mode senyap.";
         }
 
         try {
