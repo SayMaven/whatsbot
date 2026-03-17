@@ -35,8 +35,7 @@ client.on('message', async msg => {
         return; 
     }
 
-    // 3. TRIGGER PANGGILAN + NAMA FULL + TOLONG
-    // Gw tambahin 'abil' dan 'tolong' ke sini biar otomatis ketangkep
+    // 3. TRIGGER PANGGILAN
     const regexPanggilan = /\b(p|bil|abil|wei|woi|balas|lama|tolong)\b/;
 
     if (regexPanggilan.test(text)) {
@@ -55,7 +54,6 @@ client.on('message', async msg => {
         }
 
         try {
-            // Prompt ditajamkan buat ngerespons "tolong" dan chat kepanjangan
             const prompt = `
             Kondisi Abil Saat Ini: ${statusKondisi}
             Pesan dari temannya: "${msg.body}"
