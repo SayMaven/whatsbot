@@ -4,7 +4,6 @@ const qrcode = require('qrcode-terminal');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-// Pake model terbaru yang lu bilang bisa
 const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' }); 
 
 const client = new Client({
@@ -17,7 +16,7 @@ client.on('qr', (qr) => {
 });
 
 client.on('ready', () => {
-    console.log('Bot Sarkas v3.0 (Time-Aware) udah jalan bro!');
+    console.log('Bot Sarkas v3.1 (Tolong & Teks Panjang Edition) udah jalan bro!');
 });
 
 client.on('message', async msg => {
@@ -36,48 +35,50 @@ client.on('message', async msg => {
         return; 
     }
 
-    // 3. TRIGGER PANGGILAN
-    const regexPanggilan = /\b(p|bil|wei|woi|balas|lama)\b/;
+    // 3. TRIGGER PANGGILAN + NAMA FULL + TOLONG
+    // Gw tambahin 'abil' dan 'tolong' ke sini biar otomatis ketangkep
+    const regexPanggilan = /\b(p|bil|abil|wei|woi|balas|lama|tolong)\b/;
 
     if (regexPanggilan.test(text)) {
-        console.log(`[CCTV] Ada yang nge-ping: "${msg.body}"`);
+        console.log(`[CCTV] Ada pesan ketriger: "${msg.body}"`);
         
         // --- LOGIC DETEKSI WAKTU ---
-        const jam = new Date().getHours(); // Ngambil jam dari sistem laptop (WIB)
+        const jam = new Date().getHours(); 
         let statusKondisi = "";
 
         if (jam >= 6 && jam < 18) {
-            statusKondisi = "Sekarang pagi/siang/sore. Abil lagi sibuk beraktivitas, ngerjain tugas, atau fokus kerja remote. Jadi HP-nya dianggurin.";
+            statusKondisi = "Sekarang pagi/siang/sore. Abil lagi sibuk nugas kuliah atau fokus ngerjain project remote-nya. HP dianggurin.";
         } else if (jam >= 18 && jam < 23) {
-            statusKondisi = "Sekarang malam hari. Abil lagi santai, me-time, atau lagi push rank/main game ritme. Jangan diganggu.";
+            statusKondisi = "Sekarang malam hari. Abil lagi me-time, dengerin musik J-Pop, atau main game rhythm. Jangan diganggu.";
         } else {
-            statusKondisi = "Sekarang tengah malam/dini hari. Abil kemungkinan besar lagi tidur lelap atau lagi begadang ngoding project. HP mode senyap.";
+            statusKondisi = "Sekarang tengah malam/dini hari. Abil kemungkinan besar lagi tidur lelap atau lagi mode kalong begadang ngoding. HP mode senyap.";
         }
 
         try {
-            // Prompt Super Ketat biar gak ngasih opsi 1, 2, 3
+            // Prompt ditajamkan buat ngerespons "tolong" dan chat kepanjangan
             const prompt = `
             Kondisi Abil Saat Ini: ${statusKondisi}
             Pesan dari temannya: "${msg.body}"
 
-            Tugasmu: Berperanlah sebagai asisten bot WhatsApp Abil. Balas chat tersebut dengan nada santai, sedikit sarkas ala anak muda (gue, lu, bro). Jelaskan alasan Abil tidak membalas berdasarkan "Kondisi Abil Saat Ini".
+            Tugasmu: Berperanlah sebagai asisten bot WhatsApp Abil. Balas chat tersebut dengan nada santai, sedikit sarkas ala anak muda (gue, lu, bro).
             
             ATURAN SANGAT KETAT:
             1. LANGSUNG BERIKAN ISI BALASANNYA SAJA!
             2. DILARANG MEMBERIKAN PILIHAN ATAU OPSI (1, 2, 3).
-            3. DILARANG MENGGUNAKAN AWALAN SEPERTI "Oke", "Tentu", "Ini dia".
-            4. Balasan harus singkat, maksimal 2 kalimat.
+            3. Jika pesan mengandung kata "tolong" atau meminta bantuan, tolak dengan sarkas dan jelaskan Abil tidak bisa diganggu sekarang karena kondisinya. Suruh nunggu Abil buka HP.
+            4. Jika pesannya terlihat panjang lebar (curhat/cerita) tapi ada panggilan namanya, suruh langsung to the point aja karena Abil gak lagi mantengin layar.
+            5. DILARANG MENGGUNAKAN AWALAN SEPERTI "Oke", "Tentu", "Ini dia".
+            6. Balasan harus singkat, maksimal 2 kalimat.
             `;
 
             const result = await model.generateContent(prompt);
-            let responseText = result.response.text().trim(); // .trim() buat ngilangin spasi/enter berlebih
+            let responseText = result.response.text().trim();
             
             await msg.reply(`*[Asisten Bot]*\n${responseText}`);
 
         } catch (error) {
             console.error("[ERROR AI]:", error.message);
-            // FALLBACK: Kalau API Limit / Error 429, bot bakal pake balasan manual ini
-            await msg.reply(`*[Asisten Bot]*\nSabar woi, Abil lagi gak megang HP. (Botnya lagi limit API, ntar juga dibales sama orangnya).`);
+            await msg.reply(`*[Asisten Bot]*\nSabar, Abil lagi gak megang HP. (Ntar juga dibales sama orangnya).`);
         }
     }
 });
