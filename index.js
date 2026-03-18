@@ -71,6 +71,7 @@ client.on('message', async msg => {
             4. Jika pesannya terlihat panjang lebar (curhat/cerita) tapi ada panggilan namanya, suruh langsung to the point aja karena Abil gak lagi mantengin layar.
             5. DILARANG MENGGUNAKAN AWALAN SEPERTI "Oke", "Tentu", "Ini dia".
             6. Balasan harus singkat, maksimal 2 kalimat.
+            7. balas sesuai konteks chat.
             `;
 
             const result = await model.generateContent(prompt);
