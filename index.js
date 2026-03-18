@@ -26,12 +26,16 @@ client.on('message', async msg => {
     const text = msg.body.toLowerCase();
 
     // 1. FILTER DOSEN / KAMPUS
-    const kataBahaya = ['assalamualaikum', 'bapak', 'ibu', 'kuliah', 'nim', 'absen', 'revisi', 'ujian'];
+    const kataBahaya = ['assalamualaikum', 'bapak', 'ibu', 'kuliah', 'nim', 'absen', 'revisi', 'ujian', 'ok', 'sip', ];
     if (kataBahaya.some(kata => text.includes(kata))) return; 
 
     // 2. EASTER EGG: SAWIT
     if (text.includes('sawit') || text.includes('nyawit')) {
         await msg.reply('*[Asisten Bot]*\nnyawit nih orang 🌴🤣');
+        return; 
+    }
+    if (text.includes('terima kasih') || text.includes('makasih')) {
+        await msg.reply('*[Asisten Bot]*\nOk sip sama sama');
         return; 
     }
 
