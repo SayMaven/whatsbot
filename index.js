@@ -1,5 +1,6 @@
 require('dotenv').config();
-const { Client, LocalAuth } = require('whatsapp-web.js');
+const fs = require('fs');
+const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
@@ -16,24 +17,38 @@ client.on('qr', (qr) => {
 });
 
 client.on('ready', () => {
-    console.log('Bot Sarkas v3.1 (Tolong & Teks Panjang Edition) udah jalan bro!');
+    console.log('Bot Sarkas v3.4 (All Sticker Edition) udah jalan bro!');
 });
 
 client.on('message', async msg => {
-    const chat = await msg.getChat();
-    if (chat.isGroup || msg.isStatus) return;
+    if (msg.from.endsWith('@g.us') || msg.isStatus) return;
 
     const text = msg.body.toLowerCase();
 
-    // 1. FILTER DOSEN / KAMPUS
-    const kataBahaya = ['assalamualaikum', 'bapak', 'ibu', 'kuliah', 'nim', 'absen', 'revisi', 'ujian', 'ok', 'sip', ];
-    if (kataBahaya.some(kata => text.includes(kata))) return; 
+    // --- SETUP NOMOR KORBAN (BAYU) ---
+    const nomorBayu = '62895410873569@c.us'; 
+    const isBayu = msg.from === nomorBayu;
 
-    // 2. EASTER EGG: SAWIT
-    if (text.includes('sawit') || text.includes('nyawit')) {
-        await msg.reply('*[Asisten Bot]*\nnyawit nih orang 🌴🤣');
+    // 1. FILTER DOSEN / KAMPUS (Aman pakai Regex)
+    const regexBahaya = /\b(assalamualaikum|bapak|ibu|kuliah|nim|absen|revisi|ujian|ok|sip)\b/;
+    if (regexBahaya.test(text)) {
         return; 
     }
+
+    // 2. EASTER EGG: SAWIT + STICKER
+    if (text.includes('sawit') || text.includes('nyawit')) {
+        await msg.reply('*[Asisten Bot]*\nnyawit nih orang 🌴🤣');
+        
+        const pathStikerSawit = './sticker/meme/sawit.webp';
+        if (fs.existsSync(pathStikerSawit)) {
+            const media = MessageMedia.fromFilePath(pathStikerSawit);
+            await client.sendMessage(msg.from, media, { sendMediaAsSticker: true });
+        } else {
+            console.log(`[WARNING] File stiker tidak ditemukan di: ${pathStikerSawit}`);
+        }
+        return; 
+    }
+    
     if (text.includes('terima kasih') || text.includes('makasih')) {
         await msg.reply('*[Asisten Bot]*\nOk sip sama sama');
         return; 
@@ -43,7 +58,7 @@ client.on('message', async msg => {
     const regexPanggilan = /\b(p|bil|abil|wei|woi|balas|lama|tolong)\b/;
 
     if (regexPanggilan.test(text)) {
-        console.log(`[CCTV] Ada pesan ketriger: "${msg.body}"`);
+        console.log(`[CCTV] Ada pesan ketriger dari ${msg.from}: "${msg.body}"`);
         
         // --- LOGIC DETEKSI WAKTU ---
         const jam = new Date().getHours(); 
@@ -58,7 +73,8 @@ client.on('message', async msg => {
         }
 
         try {
-            const prompt = `
+            // PROMPT DEFAULT
+            let prompt = `
             Kondisi Abil Saat Ini: ${statusKondisi}
             Pesan dari temannya: "${msg.body}"
 
@@ -67,21 +83,70 @@ client.on('message', async msg => {
             ATURAN SANGAT KETAT:
             1. LANGSUNG BERIKAN ISI BALASANNYA SAJA!
             2. DILARANG MEMBERIKAN PILIHAN ATAU OPSI (1, 2, 3).
-            3. Jika pesan mengandung kata "tolong" atau meminta bantuan, tolak dengan sarkas dan jelaskan Abil tidak bisa diganggu sekarang karena kondisinya. Suruh nunggu Abil buka HP.
-            4. Jika pesannya terlihat panjang lebar (curhat/cerita) tapi ada panggilan namanya, suruh langsung to the point aja karena Abil gak lagi mantengin layar.
+            3. Jika pesan mengandung kata "tolong", tolak dengan sarkas.
+            4. Jika pesannya terlihat panjang lebar (curhat/cerita), suruh langsung to the point.
             5. DILARANG MENGGUNAKAN AWALAN SEPERTI "Oke", "Tentu", "Ini dia".
             6. Balasan harus singkat, maksimal 2 kalimat.
-            7. balas sesuai konteks chat.
             `;
 
+            // PROMPT SPESIAL BAYU (RIKA)
+            if (isBayu) {
+                prompt = `
+                Kondisi Abil Saat Ini: ${statusKondisi}
+                Pesan dari temannya (nama aslinya Bayu, tapi KAMU WAJIB PANGGIL DIA "RIKA atau kntl"): "${msg.body}"
+
+                Tugasmu: Berperanlah sebagai asisten bot WhatsApp Abil. Balas chat tersebut dengan nada SANGAT BADASS, KASAR, SAVAGE, dan nge-roasting habis-habisan.
+                
+                ATURAN KHUSUS UNTUK RIKA (BAYU):
+                1. WAJIB sapa/panggil dia dengan "Rika atau jembt atau kntl".
+                2. Jangan kasih ampun, balas dengan kata-kata tajam.
+                3. LANGSUNG BERIKAN ISI BALASANNYA SAJA! TANPA OPSI!
+                4. Jelaskan alasan Abil tidak membalas sesuai kondisinya.
+                5. Maksimal 2 kalimat.
+                `;
+            }
+
+            // 1. Eksekusi AI dan kirim teks balasannya
             const result = await model.generateContent(prompt);
             let responseText = result.response.text().trim();
-            
             await msg.reply(`*[Asisten Bot]*\n${responseText}`);
 
+            // 2. Eksekusi kirim Stiker setelah teks terkirim
+            if (isBayu) {
+                // Stiker khusus buat roasting Bayu
+                const pathStikerBayu = './sticker/meme/1.webp';
+                if (fs.existsSync(pathStikerBayu)) {
+                    const mediaBayu = MessageMedia.fromFilePath(pathStikerBayu);
+                    await client.sendMessage(msg.from, mediaBayu, { sendMediaAsSticker: true });
+                }
+            } else {
+                // Stiker umum buat temen lu yang lain (misal gambar orang sibuk/tidur)
+                const pathStikerUmum = './sticker/meme/6.webp'; 
+                if (fs.existsSync(pathStikerUmum)) {
+                    const mediaUmum = MessageMedia.fromFilePath(pathStikerUmum);
+                    await client.sendMessage(msg.from, mediaUmum, { sendMediaAsSticker: true });
+                }
+            }
+
         } catch (error) {
-            console.error("[ERROR AI]:", error.message);
-            await msg.reply(`*[Asisten Bot]*\nSabar, Abil lagi gak megang HP. (Ntar juga dibales sama orangnya).`);
+            // --- CUSTOM CATCH ERROR KHUSUS BAYU/RIKA ---
+            if (isBayu) {
+                console.error("[ERROR AI RIKA]:", error.message);
+                await msg.reply(`*[Asisten Bot]*\nBingung gue baca chat lu Kntl. Bot aja muak ngeladenin lu.`);
+                const pathStikerBayuError = './sticker/meme/5.webp'; 
+                if (fs.existsSync(pathStikerBayuError)) {
+                    const mediaUmum = MessageMedia.fromFilePath(pathStikerBayuError);
+                    await client.sendMessage(msg.from, mediaUmum, { sendMediaAsSticker: true });
+                }
+            } else {
+                console.error("[ERROR AI]:", error.message);
+                await msg.reply(`*[Asisten Bot]*\nSabar, Abil lagi gak megang HP. (ntar dibales juga sama dia).`);
+                const pathStikerError = './sticker/meme/4.webp'; 
+                if (fs.existsSync(pathStikerError)) {
+                    const mediaUmum = MessageMedia.fromFilePath(pathStikerError);
+                    await client.sendMessage(msg.from, mediaUmum, { sendMediaAsSticker: true });
+                }
+            }
         }
     }
 });
