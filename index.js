@@ -55,7 +55,7 @@ client.on('message', async msg => {
     }
 
     // 3. TRIGGER PANGGILAN
-    const regexPanggilan = /\b(p|bil|abil|wei|woi|balas|lama|tolong)\b/;
+    const regexPanggilan = /\b(p|bil|abil|wei|woi|balas|lama|tolong|bg|bang)\b/;
 
     if (regexPanggilan.test(text)) {
         console.log(`[CCTV] Ada pesan ketriger dari ${msg.from}: "${msg.body}"`);
@@ -87,6 +87,7 @@ client.on('message', async msg => {
             4. Jika pesannya terlihat panjang lebar (curhat/cerita), suruh langsung to the point.
             5. DILARANG MENGGUNAKAN AWALAN SEPERTI "Oke", "Tentu", "Ini dia".
             6. Balasan harus singkat, maksimal 2 kalimat.
+            7. Jangan eksplisit menyebut nama abil, gunakan kata-kata lain.
             `;
 
             // PROMPT SPESIAL BAYU (RIKA)
