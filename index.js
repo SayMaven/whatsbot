@@ -37,20 +37,34 @@ client.on('message', async msg => {
 
     // 2. EASTER EGG: SAWIT + STICKER
     if (text.includes('sawit') || text.includes('nyawit')) {
-        await msg.reply('*[Asisten Bot]*\nnyawit nih orang 🌴🤣');
+        await msg.reply('*[Asisten Bot]*\nUdah nyawitnya?');
         
-        const pathStikerSawit = './sticker/meme/sawit.webp';
-        if (fs.existsSync(pathStikerSawit)) {
-            const media = MessageMedia.fromFilePath(pathStikerSawit);
+        const pathStikerSawit1 = './sticker/meme/sawit3.webp';
+        if (fs.existsSync(pathStikerSawit1)) {
+            const media = MessageMedia.fromFilePath(pathStikerSawit1);
             await client.sendMessage(msg.from, media, { sendMediaAsSticker: true });
         } else {
-            console.log(`[WARNING] File stiker tidak ditemukan di: ${pathStikerSawit}`);
+            console.log(`[WARNING] File stiker tidak ditemukan di: ${pathStikerSawit1}`);
+        }
+        const pathStikerSawit2 = './sticker/meme/sawit2.webp';
+        if (fs.existsSync(pathStikerSawit2)) {
+            const media = MessageMedia.fromFilePath(pathStikerSawit2);
+            await client.sendMessage(msg.from, media, { sendMediaAsSticker: true });
+        } else {
+            console.log(`[WARNING] File stiker tidak ditemukan di: ${pathStikerSawit2}`);
         }
         return; 
     }
     
     if (text.includes('terima kasih') || text.includes('makasih')) {
-        await msg.reply('*[Asisten Bot]*\nOk sip sama sama');
+        await msg.reply('*[Asisten Bot]*\nOk sip');
+        const pathStikerSip = './sticker/meme/9.webp';
+        if (fs.existsSync(pathStikerSip)) {
+            const media = MessageMedia.fromFilePath(pathStikerSip);
+            await client.sendMessage(msg.from, media, { sendMediaAsSticker: true });
+        } else {
+            console.log(`[WARNING] File stiker tidak ditemukan di: ${pathStikerSip}`);
+        }
         return; 
     }
 
@@ -115,9 +129,14 @@ client.on('message', async msg => {
             // 2. Eksekusi kirim Stiker setelah teks terkirim
             if (isBayu) {
                 // Stiker khusus buat roasting Bayu
-                const pathStikerBayu = './sticker/meme/1.webp';
-                if (fs.existsSync(pathStikerBayu)) {
-                    const mediaBayu = MessageMedia.fromFilePath(pathStikerBayu);
+                const pathStikerBayu1 = './sticker/meme/1.webp';
+                if (fs.existsSync(pathStikerBayu1)) {
+                    const mediaBayu = MessageMedia.fromFilePath(pathStikerBayu1);
+                    await client.sendMessage(msg.from, mediaBayu, { sendMediaAsSticker: true });
+                }
+                const pathStikerBayu2 = './sticker/meme/1.webp';
+                if (fs.existsSync(pathStikerBayu2)) {
+                    const mediaBayu = MessageMedia.fromFilePath(pathStikerBayu2);
                     await client.sendMessage(msg.from, mediaBayu, { sendMediaAsSticker: true });
                 }
             } else {
