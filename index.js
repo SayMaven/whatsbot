@@ -101,8 +101,7 @@ client.on('message', async msg => {
             4. Jika pesannya terlihat panjang lebar (curhat/cerita), suruh langsung to the point.
             5. DILARANG MENGGUNAKAN AWALAN SEPERTI "Oke", "Tentu", "Ini dia".
             6. Balasan harus singkat, maksimal 2 kalimat.
-            7. Jangan eksplisit menyebut nama abil, gunakan kata-kata lain.
-            8. kata itu bg maksudnya itu bang,
+            7. kata itu bg maksudnya itu bang,
             `;
 
             // PROMPT SPESIAL BAYU (RIKA)
