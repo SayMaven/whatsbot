@@ -102,6 +102,7 @@ client.on('message', async msg => {
             5. DILARANG MENGGUNAKAN AWALAN SEPERTI "Oke", "Tentu", "Ini dia".
             6. Balasan harus singkat, maksimal 2 kalimat.
             7. Jangan eksplisit menyebut nama abil, gunakan kata-kata lain.
+            8. kata itu bg maksudnya itu bang,
             `;
 
             // PROMPT SPESIAL BAYU (RIKA)
@@ -141,7 +142,7 @@ client.on('message', async msg => {
                 }
             } else {
                 // Stiker umum buat temen lu yang lain (misal gambar orang sibuk/tidur)
-                const pathStikerUmum = './sticker/meme/6.webp'; 
+                const pathStikerUmum = './sticker/meme/2.webp'; 
                 if (fs.existsSync(pathStikerUmum)) {
                     const mediaUmum = MessageMedia.fromFilePath(pathStikerUmum);
                     await client.sendMessage(msg.from, mediaUmum, { sendMediaAsSticker: true });
