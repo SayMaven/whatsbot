@@ -69,7 +69,7 @@ client.on('message', async msg => {
     }
 
     // 3. TRIGGER PANGGILAN
-    const regexPanggilan = /\b(p|bil|abil|wei|woi|balas|lama|tolong|bg|bang)\b/;
+    const regexPanggilan = /\b(p|bil|abil|wei|woi|balas|lama|tolong|bg|bang|bit|bro|ngentot|ajg|anjing|kontol|kntl|anjg)\b/;
 
     if (regexPanggilan.test(text)) {
         console.log(`[CCTV] Ada pesan ketriger dari ${msg.from}: "${msg.body}"`);
@@ -129,7 +129,7 @@ client.on('message', async msg => {
             // 2. Eksekusi kirim Stiker setelah teks terkirim
             if (isBayu) {
                 // Stiker khusus buat roasting Bayu
-                const pathStikerBayu1 = './sticker/meme/1.webp';
+                const pathStikerBayu1 = './sticker/meme/7.webp';
                 if (fs.existsSync(pathStikerBayu1)) {
                     const mediaBayu = MessageMedia.fromFilePath(pathStikerBayu1);
                     await client.sendMessage(msg.from, mediaBayu, { sendMediaAsSticker: true });
