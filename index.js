@@ -69,7 +69,7 @@ client.on('message', async msg => {
     }
 
     // 3. TRIGGER PANGGILAN
-    const regexPanggilan = /\b(p|bil|abil|wei|woi|balas|lama|tolong|bg|bang|bit|bro|ngentot|ajg|anjing|kontol|kntl|anjg)\b/;
+    const regexPanggilan = /\b(p|bil|abil|wei|woi|balas|lama|tolong|bg|bang|bit|bro|ngentot|ajg|anjing|kontol|kntl|anjg|bill)\b/;
 
     if (regexPanggilan.test(text)) {
         console.log(`[CCTV] Ada pesan ketriger dari ${msg.from}: "${msg.body}"`);
