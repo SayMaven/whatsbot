@@ -83,7 +83,7 @@ client.on('message', async msg => {
         } else if (jam >= 18 && jam < 23) {
             statusKondisi = "Sekarang malam hari. Abil lagi me-time, dengerin musik , game rhythm atau push project. Jangan diganggu.";
         } else {
-            statusKondisi = "Sekarang tengah malam/dini hari. Abil kemungkinan besar lagi tidur lelap atau lagi mode begadang ngoding. HP mode senyap.";
+            statusKondisi = "Sekarang tengah malam/dini hari. Abil kemungkinan besar lagi tidur lelap. HP mode senyap.";
         }
 
         try {
@@ -92,7 +92,7 @@ client.on('message', async msg => {
             Kondisi Abil Saat Ini: ${statusKondisi}
             Pesan dari temannya: "${msg.body}"
 
-            Tugasmu: Berperanlah sebagai asisten bot WhatsApp Abil. Balas chat tersebut dengan nada santai, sedikit sarkas ala anak muda (gue, lu, bro).
+            Tugasmu: Berperanlah sebagai asisten bot WhatsApp Abil. Balas chat tersebut dengan nada santai (gue, lu, bro).
             
             ATURAN SANGAT KETAT:
             1. LANGSUNG BERIKAN ISI BALASANNYA SAJA!
@@ -101,23 +101,25 @@ client.on('message', async msg => {
             4. Jika pesannya terlihat panjang lebar (curhat/cerita), suruh langsung to the point.
             5. DILARANG MENGGUNAKAN AWALAN SEPERTI "Oke", "Tentu", "Ini dia".
             6. Balasan harus singkat, maksimal 2 kalimat.
-            7. kata itu bg maksudnya itu bang,
+            7. kata itu bg maksudnya itu bang.
+            8. Jangan eksplisit bilang abil lagi cari uang.
             `;
 
             // PROMPT SPESIAL BAYU (RIKA)
             if (isBayu) {
                 prompt = `
                 Kondisi Abil Saat Ini: ${statusKondisi}
-                Pesan dari temannya (nama aslinya Bayu, tapi KAMU WAJIB PANGGIL DIA "RIKA atau kntl"): "${msg.body}"
+                Pesan dari temannya (nama aslinya Bayu, tapi KAMU WAJIB PANGGIL DIA "RIKA atau lu"): "${msg.body}"
 
-                Tugasmu: Berperanlah sebagai asisten bot WhatsApp Abil. Balas chat tersebut dengan nada SANGAT BADASS, KASAR, SAVAGE, dan nge-roasting habis-habisan.
+                Tugasmu: Berperanlah sebagai asisten bot WhatsApp Abil. Balas chat tersebut dengan nada menyalahkan si bayu atas apa yang dilakukan.
                 
                 ATURAN KHUSUS UNTUK RIKA (BAYU):
-                1. WAJIB sapa/panggil dia dengan "Rika atau jembt atau kntl".
-                2. Jangan kasih ampun, balas dengan kata-kata tajam.
+                1. WAJIB sapa/panggil dia dengan "Rika atau lu".
+                2. balas dengan kata-kata sedih.
                 3. LANGSUNG BERIKAN ISI BALASANNYA SAJA! TANPA OPSI!
-                4. Jelaskan alasan Abil tidak membalas sesuai kondisinya.
+                4. Jelaskan alasan Abil tidak membalas sesuai kondisinya dan salahkan rika.
                 5. Maksimal 2 kalimat.
+                6. Buat balasan seolah olah abil adalah seorang cewe.
                 `;
             }
 
@@ -128,20 +130,15 @@ client.on('message', async msg => {
 
             // 2. Eksekusi kirim Stiker setelah teks terkirim
             if (isBayu) {
-                // Stiker khusus buat roasting Bayu
-                const pathStikerBayu1 = './sticker/meme/7.webp';
+                const pathStikerBayu1 = './sticker/meme/3.webp';
                 if (fs.existsSync(pathStikerBayu1)) {
                     const mediaBayu = MessageMedia.fromFilePath(pathStikerBayu1);
                     await client.sendMessage(msg.from, mediaBayu, { sendMediaAsSticker: true });
                 }
-                const pathStikerBayu2 = './sticker/meme/1.webp';
-                if (fs.existsSync(pathStikerBayu2)) {
-                    const mediaBayu = MessageMedia.fromFilePath(pathStikerBayu2);
-                    await client.sendMessage(msg.from, mediaBayu, { sendMediaAsSticker: true });
-                }
-            } else {
+            } 
+            else {
                 // Stiker umum buat temen lu yang lain (misal gambar orang sibuk/tidur)
-                const pathStikerUmum = './sticker/meme/2.webp'; 
+                const pathStikerUmum = './sticker/meme/bushido.webp'; 
                 if (fs.existsSync(pathStikerUmum)) {
                     const mediaUmum = MessageMedia.fromFilePath(pathStikerUmum);
                     await client.sendMessage(msg.from, mediaUmum, { sendMediaAsSticker: true });
@@ -152,8 +149,8 @@ client.on('message', async msg => {
             // --- CUSTOM CATCH ERROR KHUSUS BAYU/RIKA ---
             if (isBayu) {
                 console.error("[ERROR AI RIKA]:", error.message);
-                await msg.reply(`*[Asisten Bot]*\nBingung gue baca chat lu Kntl. Bot aja muak ngeladenin lu.`);
-                const pathStikerBayuError = './sticker/meme/5.webp'; 
+                await msg.reply(`*[Asisten Bot]*\nJangan ganggu abil. Dia lagi sibuk dengan projectnya.`);
+                const pathStikerBayuError = './sticker/meme/13.webp'; 
                 if (fs.existsSync(pathStikerBayuError)) {
                     const mediaUmum = MessageMedia.fromFilePath(pathStikerBayuError);
                     await client.sendMessage(msg.from, mediaUmum, { sendMediaAsSticker: true });
@@ -161,7 +158,7 @@ client.on('message', async msg => {
             } else {
                 console.error("[ERROR AI]:", error.message);
                 await msg.reply(`*[Asisten Bot]*\nSabar, Abil lagi gak megang HP. (ntar dibales juga sama dia).`);
-                const pathStikerError = './sticker/meme/4.webp'; 
+                const pathStikerError = './sticker/meme/rimi.webp'; 
                 if (fs.existsSync(pathStikerError)) {
                     const mediaUmum = MessageMedia.fromFilePath(pathStikerError);
                     await client.sendMessage(msg.from, mediaUmum, { sendMediaAsSticker: true });
