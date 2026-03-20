@@ -29,8 +29,7 @@ client.on('message', async msg => {
     const nomorBayu = '62895410873569@c.us'; 
     const isBayu = msg.from === nomorBayu;
 
-    // 1. FILTER DOSEN / KAMPUS (Aman pakai Regex)
-    const regexBahaya = /\b(assalamualaikum|bapak|ibu|kuliah|nim|absen|revisi|ujian|ok|sip)\b/;
+    const regexBahaya = /\b(assalamualaikum|bapak|ibu|kuliah|nim|absen|revisi|ujian|ok[ey]*|sip+)\b/;
     if (regexBahaya.test(text)) {
         return; 
     }
@@ -56,14 +55,15 @@ client.on('message', async msg => {
         return; 
     }
     
-    if (text.includes('terima kasih') || text.includes('makasih')) {
+    const regexMakasih = /\b(terima\s*kasi[h]*|m+a+k+a+s+i+[h]*|mksh|makaci+)\b/;
+    if (regexMakasih.test(text)) {
         await msg.reply('*[Asisten Bot]*\nOk sip');
-        const pathStikerSip = './sticker/meme/9.webp';
-        if (fs.existsSync(pathStikerSip)) {
-            const media = MessageMedia.fromFilePath(pathStikerSip);
+        const pathStikerMakasih = './sticker/meme/9.webp';
+        if (fs.existsSync(pathStikerMakasih)) {
+            const media = MessageMedia.fromFilePath(pathStikerMakasih);
             await client.sendMessage(msg.from, media, { sendMediaAsSticker: true });
         } else {
-            console.log(`[WARNING] File stiker tidak ditemukan di: ${pathStikerSip}`);
+            console.log(`[WARNING] File stiker tidak ditemukan di: ${pathStikerMakasih}`);
         }
         return; 
     }
