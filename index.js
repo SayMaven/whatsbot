@@ -26,8 +26,14 @@ client.on('message', async msg => {
     const text = msg.body.toLowerCase();
 
     // --- SETUP NOMOR KORBAN (BAYU) ---
-    const nomorBayu = '62895410873569@c.us'; 
+    const nomorBayu = process.env.NOMOR_BAYU;
     const isBayu = msg.from === nomorBayu;
+
+    const nomorKeluarga = process.env.NOMOR_KELUARGA ? process.env.NOMOR_KELUARGA.split(',') : [];
+    if (nomorKeluarga.includes(msg.from)) {
+        console.log(`[CCTV] Keluarga nge-chat: "${msg.body}" (Bot mingkem total)`);
+        return; 
+    }
 
     const regexBahaya = /\b(assalamualaikum|bapak|ibu|kuliah|nim|absen|revisi|ujian|ok[ey]*|sip+)\b/;
     if (regexBahaya.test(text)) {
