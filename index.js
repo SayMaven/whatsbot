@@ -75,7 +75,7 @@ client.on('message', async msg => {
     }
 
     // 3. TRIGGER PANGGILAN
-    const regexPanggilan = /\b(p|bil|abil|wei|woi|balas|lama|tolong|bg|bang|bit|bro|ngentot|ajg|anjing|kontol|kntl|anjg|bill)\b/;
+    const regexPanggilan = /\b(p|bil|abil|wei|woi|balas|lama|tolong|bg|bang|bit|bro|ngentot|ajg|anjing|kontol|kntl|anjg|bi[l]*)\b/;
 
     if (regexPanggilan.test(text)) {
         console.log(`[CCTV] Ada pesan ketriger dari ${msg.from}: "${msg.body}"`);
@@ -85,7 +85,7 @@ client.on('message', async msg => {
         let statusKondisi = "";
 
         if (jam >= 6 && jam < 18) {
-            statusKondisi = "Sekarang pagi/siang/sore. Abil lagi sibuk atau fokus ngerjain project remote-nya. HP dianggurin.";
+            statusKondisi = "Sekarang pagi/siang/sore. Abil lagi sibuk. HP dianggurin.";
         } else if (jam >= 18 && jam < 23) {
             statusKondisi = "Sekarang malam hari. Abil lagi me-time, dengerin musik , game rhythm atau push project. Jangan diganggu.";
         } else {
@@ -125,7 +125,8 @@ client.on('message', async msg => {
                 3. LANGSUNG BERIKAN ISI BALASANNYA SAJA! TANPA OPSI!
                 4. Jelaskan alasan Abil tidak membalas sesuai kondisinya dan salahkan rika.
                 5. Maksimal 2 kalimat.
-                6. Buat balasan seolah olah abil adalah seorang cewe.
+                6. Buat balasan seolah olah abil adalah seorang cewe dan jangan eksplisit bilang abil adalah cewe.
+                7. Sesekali puji si rika.
                 `;
             }
 
@@ -142,14 +143,14 @@ client.on('message', async msg => {
                     await client.sendMessage(msg.from, mediaBayu, { sendMediaAsSticker: true });
                 }
             } 
-            else {
+            /* else {
                 // Stiker umum buat temen lu yang lain (misal gambar orang sibuk/tidur)
                 const pathStikerUmum = './sticker/meme/bushido.webp'; 
                 if (fs.existsSync(pathStikerUmum)) {
                     const mediaUmum = MessageMedia.fromFilePath(pathStikerUmum);
                     await client.sendMessage(msg.from, mediaUmum, { sendMediaAsSticker: true });
                 }
-            }
+            }*/
 
         } catch (error) {
             // --- CUSTOM CATCH ERROR KHUSUS BAYU/RIKA ---
