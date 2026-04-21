@@ -138,23 +138,26 @@ client.on('message', async msg => {
                 `;
             }
 
-            // 1. Eksekusi AI via OpenRouter
+            // 1. Eksekusi AI via OpenRouter (Dibungkus chatRequest)
             const stream = await openrouter.chat.send({
-                model: "nvidia/nemotron-3-nano-30b-a3b",
-                messages: [
-                    {
-                        role: "user",
-                        content: prompt
-                    }
-                ],
-                stream: true
+                chatRequest: {
+                    model: "nvidia/nemotron-3-nano-30b-a3b",
+                    messages: [
+                        {
+                            role: "user",
+                            content: prompt
+                        }
+                    ],
+                    stream: true
+                }
             });
 
             let responseText = "";
 
             // Loop untuk mengumpulkan hasil stream menjadi satu string utuh
             for await (const chunk of stream) {
-                const content = chunk.choices[0]?.delta?.content;
+                // Tambahin optional chaining (?.) biar aman kalau chunk-nya kosong/beda format
+                const content = chunk?.choices?.[0]?.delta?.content;
                 if (content) {
                     responseText += content;
                 }
