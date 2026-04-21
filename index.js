@@ -2,10 +2,13 @@ require('dotenv').config();
 const fs = require('fs');
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+// 1. Import OpenRouter
+const { OpenRouter } = require('@openrouter/sdk');
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+// 2. Inisialisasi OpenRouter (Pastikan OPENROUTER_API_KEY ada di .env)
+const openrouter = new OpenRouter({
+    apiKey: process.env.OPENROUTER_API_KEY
+});
 
 const client = new Client({
     authStrategy: new LocalAuth()
@@ -135,9 +138,32 @@ client.on('message', async msg => {
                 `;
             }
 
-            // 1. Eksekusi AI dan kirim teks balasannya
-            const result = await model.generateContent(prompt);
-            let responseText = result.response.text().trim();
+            // 1. Eksekusi AI via OpenRouter
+            const stream = await openrouter.chat.send({
+                model: "nvidia/nemotron-3-nano-30b-a3b",
+                messages: [
+                    {
+                        role: "user",
+                        content: prompt
+                    }
+                ],
+                stream: true
+            });
+
+            let responseText = "";
+
+            // Loop untuk mengumpulkan hasil stream menjadi satu string utuh
+            for await (const chunk of stream) {
+                const content = chunk.choices[0]?.delta?.content;
+                if (content) {
+                    responseText += content;
+                }
+            }
+
+            // Trim whitespace di awal dan akhir
+            responseText = responseText.trim();
+
+            // Kirim pesan balasan
             await msg.reply(`*[Asisten Bot]*\n${responseText}`);
 
             // 2. Eksekusi kirim Stiker setelah teks terkirim
@@ -148,14 +174,6 @@ client.on('message', async msg => {
                     await client.sendMessage(msg.from, mediaBayu, { sendMediaAsSticker: true });
                 }
             }
-            /* else {
-                // Stiker umum buat temen lu yang lain (misal gambar orang sibuk/tidur)
-                const pathStikerUmum = './sticker/meme/bushido.webp'; 
-                if (fs.existsSync(pathStikerUmum)) {
-                    const mediaUmum = MessageMedia.fromFilePath(pathStikerUmum);
-                    await client.sendMessage(msg.from, mediaUmum, { sendMediaAsSticker: true });
-                }
-            }*/
 
         } catch (error) {
             // --- CUSTOM CATCH ERROR KHUSUS BAYU/RIKA ---
