@@ -5,7 +5,7 @@ const qrcode = require('qrcode-terminal');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' }); 
+const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
 const client = new Client({
     authStrategy: new LocalAuth()
@@ -21,29 +21,28 @@ client.on('ready', () => {
 });
 
 client.on('message', async msg => {
-    if (msg.from.endsWith('@g.us') || msg.isStatus) return;
+    if (msg.from.endsWith('@g.us') || msg.from.endsWith('@newsletter') || msg.isStatus) return;
 
     const text = msg.body.toLowerCase();
 
-    // --- SETUP NOMOR KORBAN (BAYU) ---
     const nomorBayu = process.env.NOMOR_BAYU;
     const isBayu = msg.from === nomorBayu;
 
     const nomorKeluarga = process.env.NOMOR_KELUARGA ? process.env.NOMOR_KELUARGA.split(',') : [];
     if (nomorKeluarga.includes(msg.from)) {
         console.log(`[CCTV] Keluarga nge-chat: "${msg.body}" (Bot mingkem total)`);
-        return; 
+        return;
     }
 
     const regexBahaya = /\b(assalamualaikum|bapak|ibu|kuliah|nim|absen|revisi|ujian|ok[ey]*|sip+)\b/;
     if (regexBahaya.test(text)) {
-        return; 
+        return;
     }
 
     // 2. EASTER EGG: SAWIT + STICKER
     if (text.includes('sawit') || text.includes('nyawit')) {
         await msg.reply('*[Asisten Bot]*\nUdah nyawitnya?');
-        
+
         const pathStikerSawit1 = './sticker/meme/sawit3.webp';
         if (fs.existsSync(pathStikerSawit1)) {
             const media = MessageMedia.fromFilePath(pathStikerSawit1);
@@ -58,9 +57,9 @@ client.on('message', async msg => {
         } else {
             console.log(`[WARNING] File stiker tidak ditemukan di: ${pathStikerSawit2}`);
         }
-        return; 
+        return;
     }
-    
+
     const regexMakasih = /\b(terima\s*kasi[h]*|m+a+k+a+s+i+[h]*|mksh|makaci+)\b/;
     if (regexMakasih.test(text)) {
         await msg.reply('*[Asisten Bot]*\nOk sip');
@@ -71,7 +70,7 @@ client.on('message', async msg => {
         } else {
             console.log(`[WARNING] File stiker tidak ditemukan di: ${pathStikerMakasih}`);
         }
-        return; 
+        return;
     }
 
     // 3. TRIGGER PANGGILAN
@@ -79,9 +78,9 @@ client.on('message', async msg => {
 
     if (regexPanggilan.test(text)) {
         console.log(`[CCTV] Ada pesan ketriger dari ${msg.from}: "${msg.body}"`);
-        
+
         // --- LOGIC DETEKSI WAKTU ---
-        const jam = new Date().getHours(); 
+        const jam = new Date().getHours();
         let statusKondisi = "";
 
         if (jam >= 6 && jam < 18) {
@@ -142,7 +141,7 @@ client.on('message', async msg => {
                     const mediaBayu = MessageMedia.fromFilePath(pathStikerBayu1);
                     await client.sendMessage(msg.from, mediaBayu, { sendMediaAsSticker: true });
                 }
-            } 
+            }
             /* else {
                 // Stiker umum buat temen lu yang lain (misal gambar orang sibuk/tidur)
                 const pathStikerUmum = './sticker/meme/bushido.webp'; 
@@ -157,7 +156,7 @@ client.on('message', async msg => {
             if (isBayu) {
                 console.error("[ERROR AI RIKA]:", error.message);
                 await msg.reply(`*[Asisten Bot]*\nJangan ganggu abil. Dia lagi sibuk dengan projectnya.`);
-                const pathStikerBayuError = './sticker/meme/13.webp'; 
+                const pathStikerBayuError = './sticker/meme/13.webp';
                 if (fs.existsSync(pathStikerBayuError)) {
                     const mediaUmum = MessageMedia.fromFilePath(pathStikerBayuError);
                     await client.sendMessage(msg.from, mediaUmum, { sendMediaAsSticker: true });
@@ -165,7 +164,7 @@ client.on('message', async msg => {
             } else {
                 console.error("[ERROR AI]:", error.message);
                 await msg.reply(`*[Asisten Bot]*\nSabar, Abil lagi gak megang HP. (ntar dibales juga sama dia).`);
-                const pathStikerError = './sticker/meme/rimi.webp'; 
+                const pathStikerError = './sticker/meme/rimi.webp';
                 if (fs.existsSync(pathStikerError)) {
                     const mediaUmum = MessageMedia.fromFilePath(pathStikerError);
                     await client.sendMessage(msg.from, mediaUmum, { sendMediaAsSticker: true });
