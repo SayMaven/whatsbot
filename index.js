@@ -34,6 +34,12 @@ client.on('message', async msg => {
         return;
     }
 
+    const nomorDosen = process.env.NOMOR_DOSEN ? process.env.NOMOR_DOSEN.split(',') : [];
+    if (nomorDosen.includes(msg.from)) {
+        console.log(`[CCTV] Dosen nge-chat: "${msg.body}" (Bot mingkem total)`);
+        return;
+    }
+
     const regexBahaya = /\b(assalamualaikum|bapak|ibu|kuliah|nim|absen|revisi|ujian|ok[ey]*|sip+)\b/;
     if (regexBahaya.test(text)) {
         return;
